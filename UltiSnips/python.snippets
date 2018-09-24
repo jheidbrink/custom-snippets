@@ -1,0 +1,155 @@
+priority -50
+
+snippet cli "Python CLI with arparse skeleton" b
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+
+
+def greet(name):
+    print('Hi, {}'.format(name))
+
+class CLI:
+
+    def _create_parser(self):
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers()
+        greet_parser = subparsers.add_parser('greet')
+        greet_parser.add_argument('name')
+        greet_parser.set_defaults(func=self.greet)
+        return parser
+
+    def _parse_and_execute(self):
+        parser = self._create_parser()
+        args = parser.parse_args()
+        args.func(args)
+
+    def greet(self, args):
+        greet(args.name)
+
+def main():
+    cli = CLI()
+    cli._parse_and_execute()
+
+if __name__ == "__main__":
+    main()
+endsnippet
+
+snippet frf "define load_file function" b
+def read_file(filename: str) -> str:
+    with open(filename) as f:
+        contents = f.read()
+    return contents
+endsnippet
+
+snippet fwf "define write_file function" b
+def write_file(filename: str, contents: str) -> None:
+    with open(filename, 'w') as f:
+        f.write(contents)
+endsnippet
+
+snippet subp "define subprocess helper functions" b
+import subprocess
+from typing import List
+
+def _run(cmdargs: List[str], **kwargs) -> subprocess.CompletedProcess:
+    kwargs['check'] = kwargs.get('check', True)
+    return subprocess.run(cmdargs, **kwargs)
+
+def _out(cmdargs: List[str], **kwargs) -> str:
+    p = _run(cmdargs, stdout=subprocess.PIPE, **kwargs)
+    return p.stdout.decode('utf8')
+endsnippet
+
+snippet lb "logging.basicConfig" b
+logging.basicConfig(level=logging.$0)
+endsnippet
+
+snippet fstripprefix "strip_prefix function" b
+def strip_prefix(prefix: str, text: str, assert_exists: bool = False):
+    if assert_exists:
+        assert text.startswith(prefix)
+    return text[len(prefix):] if text.startswith(prefix) else text
+endsnippet
+
+snippet fstripsuffix "strip_suffix function" b
+def strip_suffix(suffix: str, text: str, assert_exists: bool = False):
+    if assert_exists:
+        assert text.endswith(suffix)
+    return text[:-len(suffix)] if text.endswith(suffix) else text
+endsnippet
+
+snippet fensureabsent "ensure_absent function" b
+def ensure_absent(filename):
+    try:
+        os.remove(filename)
+    except FileNotFoundError:
+        pass
+endsnippet
+
+snippet fensuredexists "ensure_directory_exists functin" b
+def ensure_directory_exists(path: str):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        pass
+endsnippet
+
+snippet floadyaml "loadyaml function" b
+def loadyaml(filename: str) -> dict:
+    with open(filename) as file:
+        contents = file.read()
+    data = yaml.safe_load(contents)
+    return data
+endsnippet
+
+snippet ffl "filter_linewise function" b
+def filter_linewise(filter_function: Callable[[str], str], contents: str) -> str:
+    return '\n'.join(filter_function(line) for line in contents.splitlines())
+endsnippet
+
+snippet fcred "read_credentials_from_config function" b
+def read_credentials_from_config(configfilename):
+    config = configparser.ConfigParser()
+    config.read(configfilename)
+    user = config.get("credentials", "user")
+    password = config.get("credentials", "password")
+    return (user, password)
+endsnippet
+
+snippet en "enum" b
+from enum import Enum
+class Color(Enum):
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+endsnippet
+
+snippet ena "auto enum" b
+from enum import Enum, auto
+class Color(Enum):
+    RED = auto()
+    BLUE = auto()
+    GREEN = auto()
+endsnippet
+
+snippet fmatches "does regex match string" b
+def matches(regex: Union[str, re.compile], string: str) -> bool:
+    """
+    matches('hello.*', 'hello world!')
+    >>> True
+
+    matches('hello.*', 'hallo welt!')
+    >>> False
+    """
+    if type(regex) == str:
+        match = re.match(regex, string)
+    elif type(regex) == re.compile:
+        match = regex.match(string)
+    else:
+        raise TypeError('regex must be of type str or re.compile, not {type(regex)}.')
+    return bool(match)
+endsnippet
+
+# vim:ft=snippets:
